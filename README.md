@@ -1,7 +1,7 @@
 # jImageFuser
 **jImageFuser is a java/Swing Windows/Linux/MacOS graphical frontend for Enfuse and Align_image_stack.**
 
-![multi platform jExifToolGUI](https://github.com/hvdwolf/jImageFuser/blob/master/docs/screenshots/Linux-mainscreen.jpg)
+![multi platform jImageFuser](https://github.com/hvdwolf/jImageFuser/blob/main/docs/screenshots/Linux-mainscreen.jpg)
 
 <p>The combination of <strong>Enfuse</strong> and <strong>Align_image_stack</strong> give you the option to:
 <ul>
