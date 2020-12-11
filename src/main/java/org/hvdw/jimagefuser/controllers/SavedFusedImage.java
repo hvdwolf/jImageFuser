@@ -1,6 +1,7 @@
 package org.hvdw.jimagefuser.controllers;
 
 import org.hvdw.jimagefuser.MyVariables;
+import org.hvdw.jimagefuser.Utils;
 import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,10 @@ public class SavedFusedImage {
 
     HashMap<String, String> parameters = MyVariables.getParameters();
 
+    /**
+     * This method shows the preview in the bigger right pane in the JLabel
+     * @param lblPreview
+     */
     public static void displayPreview(JLabel lblPreview) {
         File fusedImage = new File(MyVariables.getFusedImage());
         if (fusedImage.exists()) {
@@ -58,7 +63,50 @@ public class SavedFusedImage {
         return previewfilestring;
     }
 
+    private static List<String> getEnfuseParameters() {
+        List<String> enfparams = new ArrayList<String>();
 
+        // First get some data
+        HashMap<String, String> parameters = MyVariables.getParameters();
+        String strFusedImage = MyVariables.getFusedImage();
+        String strFusedImageExtension = Utils.getFileExtension(strFusedImage);
+
+        //now we get a boring list of "if"s
+        if ("jpg".equals(strFusedImageExtension.toLowerCase()) || "jpeg".equals(strFusedImageExtension.toLowerCase())) {
+            enfparams.add("--compression=" + parameters.get("spnrJpeg"));
+        } else if ("tif".equals(strFusedImageExtension.toLowerCase()) || "tiff".equals(strFusedImageExtension.toLowerCase())) {
+            enfparams.add("--compression=" + parameters.get("cmbBoxTiff"));
+        }
+        // PNG is automatically saved with DEFLATE
+
+        if (("false").equals(parameters.get("cmbBoxTiff"))) {
+            enfparams.add("--levels=" + (parameters.get("spnrLevels")).trim());
+        }
+        if ("true".equals(parameters.get("hardMaskcheckBox"))) {
+            enfparams.add("--hard-mask");
+        }
+        if ("true".equals(parameters.get("CIECAM02CheckBox"))) {
+            enfparams.add("-c");
+        }
+        /*if ("true".equals(parameters.get("blendAcrosscheckBox"))) {
+            enfparams.add("")
+        }*/
+        enfparams.add("--exposure-weight=" + parameters.get("spnrExposure"));
+        enfparams.add("--saturation-weight=" + parameters.get("spnrSaturation"));
+        enfparams.add("--contrast-weight=" + parameters.get("spnrContrast"));
+        enfparams.add("--entropy-weight=" + parameters.get("spnrEntropy"));
+        enfparams.add("--exposure-mu=" + parameters.get("spnrwExposureOptimum"));  //used to be --wExposureMU
+        enfparams.add("--exposure-sigma=" + parameters.get("spnrwExposureWidth"));    // used to be --wExposureSigma
+
+        return enfparams;
+    }
+
+    /**
+     * This method aligns the images before they are processed by enfuse
+     * Alternatively: it can be used for users only wanting to align the image before "other"  processing
+     * @param imagestype
+     * @param progressBar
+     */
     public synchronized static void alignImages(String imagestype, JProgressBar progressBar) {
         String result = "";
         List<String> cmdparams = new ArrayList<String>();
@@ -147,7 +195,7 @@ public class SavedFusedImage {
             strFusedImage = MyVariables.getFusedImage();
             //tmpFusedImage= tmpfolder + File.separator + "enfuse_output.jpg";
             cmdparams.add(strFusedImage);
-            cmdparams.add("--compression=" + parameters.get("spnrJpeg"));
+            //cmdparams.add("--compression=" + parameters.get("spnrJpeg"));
             if ("true".equals(parameters.get("AIScheckBox"))) {
                 logger.info("aligning the input images for our final image");
                 OutputLabel.setText("aligning the input images for our final image");
@@ -170,7 +218,7 @@ public class SavedFusedImage {
                 }
             }
             // method to read all enfuse parameters
-            // cmdparams.addAll(getEnfuseParameters());
+            cmdparams.addAll(getEnfuseParameters());
         } else if ("preview".equals(imagestype)) {
             // Create the first preview after loading the images
             strFusedImage = tmpfolder + File.separator + "enfuse_pre_output.jpg";
@@ -187,7 +235,7 @@ public class SavedFusedImage {
             cmdparams.add("--compression=" + parameters.get("spnrJpeg"));
             cmdparams.add(tmpfolder + File.separator + "ais_pre_001*.tif");
         }
-        logger.info("enfuse command string {}", cmdparams.toString());
+        logger.debug("enfuse command string {}", cmdparams.toString());
 
         try {
             result = CommandRunner.runCommand(cmdparams);

@@ -70,8 +70,8 @@ public class mainScreen {
     private JSpinner spnrExposure;
     private JSpinner spnrContrast;
     private JSpinner spnrEntropy;
-    private JSpinner spnrwMu;
-    private JSpinner spnrwSigma;
+    private JSpinner spnrwExposureOptimum;
+    private JSpinner spnrwExposureWidth;
     private JButton btnResetEnfuse;
     private JSpinner spnrJpeg;
     private JComboBox cmbBoxTiff;
@@ -124,10 +124,6 @@ public class mainScreen {
 
     private JLabel[] mainScreenLabels() {
         return new JLabel[]{OutputLabel, lblLoadedFiles, lblPreview};
-    }
-
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
     }
 
     {
@@ -281,15 +277,15 @@ public class mainScreen {
         spnrEntropy = new JSpinner();
         panel6.add(spnrEntropy, new GridConstraints(0, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(50, -1), null, 0, false));
         final JLabel label8 = new JLabel();
-        label8.setText("wMu = Mean");
+        label8.setText("Exposure optimum");
         panel6.add(label8, new GridConstraints(1, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label9 = new JLabel();
-        label9.setText("wSigma = sigma");
+        label9.setText("Exposure width");
         panel6.add(label9, new GridConstraints(2, 4, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        spnrwMu = new JSpinner();
-        panel6.add(spnrwMu, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(50, -1), null, 0, false));
-        spnrwSigma = new JSpinner();
-        panel6.add(spnrwSigma, new GridConstraints(2, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(50, -1), null, 0, false));
+        spnrwExposureOptimum = new JSpinner();
+        panel6.add(spnrwExposureOptimum, new GridConstraints(1, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(50, -1), null, 0, false));
+        spnrwExposureWidth = new JSpinner();
+        panel6.add(spnrwExposureWidth, new GridConstraints(2, 5, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(50, -1), null, 0, false));
         btnResetEnfuse = new JButton();
         this.$$$loadButtonText$$$(btnResetEnfuse, this.$$$getMessageFromBundle$$$("translations/program_strings", "btn.resetdefs"));
         panel6.add(btnResetEnfuse, new GridConstraints(3, 4, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -448,6 +444,7 @@ public class mainScreen {
     public JComponent $$$getRootComponent$$$() {
         return rootPanel;
     }
+
 
     // endregion
 
@@ -628,8 +625,6 @@ public class mainScreen {
     }
 
 
-    // endregion
-
     /*
     / This creates the menu with the listener in its own external MenuActionListener class
      */
@@ -684,12 +679,12 @@ public class mainScreen {
         SpinnerListModel entModel = new SpinnerListModel(spinnerValues);
         spnrEntropy.setModel(entModel);
         spnrEntropy.setValue("0");
-        SpinnerListModel wmuModel = new SpinnerListModel(spinnerValues);
-        spnrwMu.setModel(wmuModel);
-        spnrwMu.setValue("0.5");
-        SpinnerListModel sigmaModel = new SpinnerListModel(spinnerValues);
-        spnrwSigma.setModel(sigmaModel);
-        spnrwSigma.setValue("0.2");
+        SpinnerListModel expOptModel = new SpinnerListModel(spinnerValues);
+        spnrwExposureOptimum.setModel(expOptModel);
+        spnrwExposureOptimum.setValue("0.5");
+        /*SpinnerListModel expWidthModel = new SpinnerListModel(spinnerValues);
+        spnrwExposureWidth.setModel(expWidthModel);
+        spnrwExposureWidth.setValue("0.2");*/
         //Align_Image_Stack
         spnrAIScontrolpoints.setModel(new SpinnerNumberModel(8, 1, 15, 1));
         spnrRemCPs.setModel(new SpinnerNumberModel(3, 1, 25, 1));
@@ -709,8 +704,8 @@ public class mainScreen {
         spnrSaturation.setValue("0.2");
         spnrContrast.setValue("0");
         spnrEntropy.setValue("0");
-        spnrwMu.setValue("0.5");
-        spnrwSigma.setValue("0.2");
+        spnrwExposureOptimum.setValue("0.5");
+        spnrwExposureWidth.setValue("0.2");
         // Now refresh paramerers in our hashmap. In this case imagestype is not important
         //createHashMap("preview");
     }
@@ -810,7 +805,6 @@ public class mainScreen {
 
         Utils.checkForNewVersion("startup");
 
-
     }
 
     /**
@@ -837,8 +831,8 @@ public class mainScreen {
         parameters.put("spnrSaturation", String.valueOf(spnrSaturation.getValue()));
         parameters.put("spnrContrast", String.valueOf(spnrContrast.getValue()));
         parameters.put("spnrEntropy", String.valueOf(spnrEntropy.getValue()));
-        parameters.put("spnrwMu", String.valueOf(spnrwMu.getValue()));
-        parameters.put("spnrwSigma", String.valueOf(spnrwSigma.getValue()));
+        parameters.put("spnrwExposureOptimum", String.valueOf(spnrwExposureOptimum.getValue()));
+        parameters.put("spnrwExposureWidth", String.valueOf(spnrwExposureWidth.getValue()));
         //Align_image_stack
         parameters.put("spnrAIScontrolpoints", String.valueOf(spnrAIScontrolpoints.getValue()));
         parameters.put("spnrRemCPs", String.valueOf((spnrRemCPs.getValue())));
